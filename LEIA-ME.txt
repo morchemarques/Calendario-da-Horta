@@ -1,0 +1,18 @@
+CALENDÁRIO DA HORTA - instalar como app no Android (Chrome)
+
+OPÇÃO A: pelo Localhost Lite (o que você já usa)
+1. Extraia o zip. Você terá uma pasta com index.html, manifest.webmanifest, sw.js e os ícones.
+2. Copie a pasta inteira (por exemplo, com o nome "Horta") para a pasta raiz do Localhost Lite.
+   Todos os arquivos precisam ficar juntos na mesma pasta.
+3. Com o servidor ligado, abra no Chrome: http://localhost:8080/Horta/
+   (use "localhost", não o número 192.168...; só assim o Chrome libera a instalação)
+4. Toque em ⋮ > "Instalar app" (ou no botão "Instalar app" do topo da tela).
+5. Depois de instalado, o app abre sozinho e funciona sem internet.
+
+OPÇÃO B: hospedar na internet (https)
+Envie os mesmos arquivos para o GitHub Pages, Netlify ou Cloudflare Pages e abra o endereço no Chrome.
+
+IMPORTANTE
+- Os dados das plantas ficam salvos no endereço usado (ex.: localhost:8080). Se mudar de endereço, use
+  "Copiar backup" no app antigo e "Restaurar" no novo (aba Mais).
+- Para atualizar o app depois, troque os arquivos na pasta e abra o app com internet/servidor ligado uma vez.

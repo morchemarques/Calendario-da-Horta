@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendário da Horta</title><meta name="theme-color" content="#fdfdf5" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#1a1c18" media="(prefers-color-scheme: dark)"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+:root{--bg:#e9f0e1;--card:#fbfdf8;--tx:#23301f;--mut:#5f6f59;--bd:#cfdcc4;--leaf:#2f6b3a;--sprout:#b7d94c;--water:#2e86c1;--feed:#a8691f;--warn:#b42318;--wbg:#fde4e0;--ok:#e1efd2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a10;--card:#1b2619;--tx:#e6efe1;--mut:#9db096;--bd:#2d3d2a;--leaf:#7fcf8b;--water:#6bb6e6;--feed:#e0a357;--warn:#ff9b8f;--wbg:#40201c;--ok:#26361f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121a10;--card:#1b2619;--tx:#e6efe1;--mut:#9db096;--bd:#2d3d2a;--leaf:#7fcf8b;--water:#6bb6e6;--feed:#e0a357;--warn:#ff9b8f;--wbg:#40201c;--ok:#26361f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+main{max-width:720px;margin:0 auto;padding:18px 14px 60px}
+h1,h2{font-family:Fraunces,Georgia,serif;margin:0}
+h1{font-size:2rem;font-weight:800;color:var(--leaf)}
+h2{font-size:1.25rem;margin:26px 0 10px}
+.sub{color:var(--mut);margin:2px 0 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.today{border-left:6px solid var(--sprout)}
+.task{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--bd)}
+.task:last-child{border:0}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 12px;min-height:40px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+.b-w{background:var(--water);border-color:var(--water);color:#fff}
+.b-f{background:var(--feed);border-color:var(--feed);color:#fff}
+.b-p{background:var(--leaf);border-color:var(--leaf);color:#fff;font-weight:700}
+:root[data-theme="dark"] .b-p,:root:not([data-theme="light"]) .b-p{color:#10200f}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.head{display:flex;gap:10px;align-items:center}
+.emo{font-size:2rem}
+.name{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:1.2rem}
+.chip{display:inline-block;font-size:.85rem;border-radius:99px;padding:3px 10px;background:var(--ok)}
+.chip.late{background:var(--wbg);color:var(--warn);font-weight:700}
+.bar{height:10px;background:var(--bd);border-radius:9px;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sprout),var(--leaf))}
+.mut{color:var(--mut);font-size:.9rem}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;min-height:40px;width:100%}
+label{display:block;font-size:.9rem;color:var(--mut)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.det{margin-top:10px;border-top:1px solid var(--bd);padding-top:10px}
+.log{font-size:.9rem;max-height:150px;overflow:auto;padding-left:0;list-style:none;margin:8px 0}
+.log li{padding:2px 0}
+svg{width:100%;height:auto;display:block}
+.tip{background:var(--ok);border-radius:10px;padding:8px 10px;font-size:.9rem;margin:8px 0}
+.empty{text-align:center;color:var(--mut);padding:24px 10px}
+.ico{display:block;width:56px;height:56px;border-radius:14px;background:var(--ok);flex:none;padding:4px}.ico svg{width:100%;height:100%}
+.tip.head{align-items:center}
+textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;width:100%}
+.ico img{width:100%;height:100%;object-fit:cover;border-radius:10px}.ph{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:6px}
+.cover{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:12px;margin-bottom:10px}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-top:8px}.cd{padding:4px 0;min-height:44px;display:flex;flex-direction:column;align-items:center;gap:2px}.cd span{display:flex;gap:2px;height:6px}.cd i{width:6px;height:6px;border-radius:50%}.cd.on{background:var(--leaf);color:var(--bg)}.cd.td{border:2px solid var(--sprout)}
+summary{cursor:pointer;margin-top:8px}
+.tb{width:100%;border-collapse:collapse;font-size:.85rem}.tb td,.tb th{padding:5px 6px;border-bottom:1px solid var(--bd);text-align:left}
+:root{--pu:#5b3fb0}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pu:#a692f2}}:root[data-theme="dark"]{--pu:#a692f2}
+.b-g{background:var(--pu);border-color:var(--pu);color:var(--bg)}
+.pills{display:flex;gap:6px;overflow-x:auto;margin:10px 0 6px;padding:3px}.pill{flex:1;min-width:66px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;font-size:.78rem}.pill.on{background:var(--leaf);border-color:var(--leaf);color:var(--bg)}.pill.now{box-shadow:0 0 0 3px var(--sprout)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--bd);color:var(--tx);font-size:1rem;min-height:44px}.chk input{width:24px;height:24px;min-height:0;flex:none;margin:0}.chk.d span{color:var(--mut);text-decoration:line-through}
+.nx{background:var(--ok);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:.92rem}
+:root{--bg:#fdfdf5;--card:#eef0e4;--tx:#1a1c18;--mut:#555b50;--bd:#c3c8bb;--leaf:#3b6939;--sprout:#bcf0b4;--ok:#d7e8cd;--water:#00658f;--feed:#8c5000;--warn:#ba1a1a;--wbg:#ffdad6;--pu:#6750a4}
+:root:not([data-theme="light"]) .b-p{color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1c18;--card:#262923;--tx:#e3e3db;--mut:#c3c8bb;--bd:#43483f;--leaf:#a1d39a;--sprout:#a1d39a;--ok:#3b4b38;--water:#7cd0ff;--feed:#ffb86b;--warn:#ffb4ab;--wbg:#93000a;--pu:#cfbcff}:root:not([data-theme="light"]) .b-p,.b-w,.b-f{color:#0d1a0c}}
+*{-webkit-tap-highlight-color:transparent}
+body{font-family:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior-y:contain}
+h1,h2,.name{font-family:inherit}
+main{padding-bottom:150px}
+main>.row{position:sticky;top:0;z-index:15;margin:0 -14px 6px;padding:10px 16px;background:var(--bg);align-items:center;flex-wrap:nowrap}
+main>.row h1{font-size:1.25rem;font-weight:500;color:var(--tx)}
+section>h2{font-size:.95rem;font-weight:700;color:var(--leaf);margin:16px 4px 8px}
+.card{border:0;border-radius:20px;background:var(--card)}.today{background:var(--ok)}
+button{border-radius:20px}.chip{border-radius:8px}input,select,textarea{border-radius:12px}.cover,.ph{border-radius:16px}.ico{border-radius:16px}
+#bn{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--card);padding:8px 4px calc(10px + env(safe-area-inset-bottom,0px))}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;border-radius:0;font-size:.75rem;color:var(--mut);padding:0;min-height:56px}
+.ni .pil{width:64px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center}.ni.on{color:var(--tx);font-weight:700}.ni.on .pil{background:var(--ok)}.ni svg{width:24px;height:24px;fill:currentColor}
+#fab{position:fixed;right:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:21;display:flex;align-items:center;gap:8px;min-height:56px;padding:0 20px;border:0;border-radius:16px;background:var(--sprout);color:#10200f;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.25)}#fab[hidden]{display:none}#fab svg{width:24px;height:24px;fill:currentColor}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}#scrim.open{opacity:1;pointer-events:auto}
+section[data-t=add]{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--bg);border-radius:28px 28px 0 0;padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));z-index:40;box-shadow:0 -4px 24px rgba(0,0,0,.3);transform:translateY(105%);visibility:hidden;transition:transform .25s,visibility .25s;max-width:720px;margin:0 auto}
+section[data-t=add].open{transform:none;visibility:visible}section[data-t=add] .card{background:none;padding:0}.grab{width:36px;height:4px;border-radius:2px;background:var(--bd);margin:0 auto 8px}
+.tb{display:flex;gap:2px;align-items:center;margin-left:auto}.tb .b-p{padding:6px 12px;min-height:40px}.ib{width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;border-radius:22px;color:var(--tx)}.ib svg{width:24px;height:24px;fill:currentColor}
+</style>
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between">
+    <div><h1>Calendário da Horta 🌱</h1><p class="sub" id="date"></p></div><span class="tb"><button id="inst" class="b-p" hidden>📲 Instalar</button><button class="ib" id="shb" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button><button class="ib" id="lkb" aria-label="Links e favoritos"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button></span>
+  </div>
+
+  <h2>Hoje</h2>
+  <div class="card today" id="today"></div>
+
+  <h2>Calendário</h2><div class="card" id="cal"></div>
+  <h2>Minhas plantas</h2>
+  <div id="plants"></div>
+
+  <h2>Para plantar este mês</h2><div class="card" id="now"></div>
+  <h2>Plantar algo novo</h2>
+  <div class="card">
+    <div class="grid">
+      <div><label for="preset">Hortaliça</label><select id="preset"></select></div>
+      <div><label for="pspec">Tipo / espécie</label><select id="pspec"></select></div>
+      <div><label for="pname">Apelido (opcional)</label><input id="pname" placeholder="Ex.: Tomate do vaso 2"></div>
+      <div><label for="pdate">Data do plantio</label><input id="pdate" type="date"></div>
+      <div><label for="pharv">Dias até colher</label><input id="pharv" type="number" min="1"></div>
+      <div><label for="pwater">Regar a cada (dias)</label><input id="pwater" type="number" min="1"></div>
+      <div><label for="pfeed">Adubar a cada (dias)</label><input id="pfeed" type="number" min="1"></div>
+    </div>
+    <div class="tip head"><span class="ico" id="pico"></span><span id="ptip"></span></div>
+    <button class="b-p" id="add">Adicionar à horta</button>
+  </div>
+  <h2>Desempenho dos adubos</h2><div class='card' id='perf'></div>
+  <h2>Links e favoritos</h2><div class="card" id="lk"></div>
+  <h2>Compartilhar</h2><div class="card" id="shc"></div>
+  <h2>Backup e lembretes</h2><div class='card'><div class='row'><button id='bk'>📋 Copiar backup</button><button id='nt'>🔔 Ativar lembretes</button></div><label for='rs' style='margin-top:10px'>Restaurar backup (cole o texto aqui)</label><textarea id='rs' rows='2'></textarea><button id='rsb' style='margin-top:6px'>Restaurar</button><p class='mut' id='inf'></p><details><summary>Como instalar como app no Chrome</summary><p class='mut'>Se o botão “📲 Instalar app” aparecer no topo, toque nele. Se não, use ⋮ → “Instalar app” ou “Adicionar à tela inicial”. Para instalação completa e uso sem internet, hospede o pacote PWA (arquivo LEIA-ME).</p></details></div>
+  <p class="mut">Os prazos são médias. Ajuste conforme clima, vaso e solo: se a terra ainda está úmida a 2 cm de profundidade, espere para regar. Os dados ficam salvos neste navegador.</p>
+</main>
+<div id="scrim"></div>
+<button id="fab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Plantar</button>
+<nav id="bn" aria-label="Navegação">
+<button class="ni on" data-t="home"><span class="pil"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>Início</button>
+<button class="ni" data-t="plants"><span class="pil"><svg viewBox="0 0 24 24"><path d="M6.05 8.05c-2.73 2.73-2.73 7.15-.02 9.88 1.47-3.4 4.09-6.24 7.36-7.93-2.77 2.34-4.71 5.61-5.39 9.32 2.6 1.23 5.8.78 7.95-1.37C19.43 14.47 20 4 20 4S9.53 4.57 6.05 8.05z"/></svg></span>Plantas</button>
+<button class="ni" data-t="cal"><span class="pil"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></span>Calendário</button>
+<button class="ni" data-t="perf"><span class="pil"><svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg></span>Adubos</button>
+<button class="ni" data-t="more"><span class="pil"><svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></span>Mais</button>
+</nav>
+
+<script>
+const PRESETS=[
+{k:"alface",n:"Alface",w:1,f:15,t:"Sol da manhã e sombra à tarde no calor. Terra sempre levemente úmida.",fert:"Húmus ou composto (rico em nitrogênio)",pg:"lesmas, pulgão, lagartas",sp:[["Crespa",55],["Americana",75],["Roxa",55],["Lisa",50],["Romana",70]]},
+{k:"rucula",n:"Rúcula",w:1,f:15,t:"Cresce rápido. Colha as folhas externas para continuar produzindo.",fert:"Húmus de minhoca",pg:"pulgão, pulga-saltão, lesmas",sp:[["Cultivada",40],["Selvagem",55]]},
+{k:"couve",n:"Couve",w:2,f:15,t:"Sol pleno. Colha as folhas de baixo para cima.",fert:"Composto + cinza de madeira",pg:"lagarta-da-couve, pulgão, mosca-branca",sp:[["Manteiga",70],["Toscana",75],["Crespa",80]]},
+{k:"tomate",n:"Tomate",w:2,f:14,t:"Precisa de tutor e sol pleno. Regue na base, sem molhar as folhas.",fert:"Composto + farinha de ossos (fósforo e potássio)",pg:"traça, mosca-branca, requeima",sp:[["Cereja",75],["Italiano",100],["Salada",110]]},
+{k:"cenoura",n:"Cenoura",w:2,f:20,t:"Terra solta e funda. Pouco nitrogênio, senão cresce só folha.",fert:"Composto bem curtido",pg:"nematoides, pulgão",sp:[["Nantes",80],["Brasília",90],["Kuroda",100]]},
+{k:"pimentao",n:"Pimentão",w:2,f:14,t:"Sol pleno. Adube mais na fase de flores e frutos.",fert:"Composto + fonte de potássio",pg:"ácaro, pulgão, broca",sp:[["Verde",100],["Vermelho",120],["Amarelo",120]]},
+{k:"cebolinha",n:"Cebolinha",w:2,f:20,t:"Corte a 3 cm do solo para rebrotar. Aguenta meia sombra.",fert:"Húmus ou esterco curtido",pg:"tripes, ferrugem",sp:[["Comum",60],["Chinesa (nirá)",70]]},
+{k:"manjericao",n:"Manjericão",w:2,f:15,t:"Pince as pontas para ramificar e retire as flores.",fert:"Húmus de minhoca",pg:"pulgão, lesmas, fungos",sp:[["Genovês",60],["Roxo",65],["Folha-larga",60]]},
+{k:"beterraba",n:"Beterraba",w:2,f:20,t:"Terra solta. Desbaste as mudas que nascerem muito juntas.",fert:"Composto + cinza (potássio)",pg:"cercospora, pulgão",sp:[["Early Wonder",60],["Tall Top",70]]},
+{k:"pepino",n:"Pepino",w:2,f:14,t:"Sol pleno. Conduza em tutor ou treliça.",fert:"Composto rico em fósforo e potássio",pg:"oídio, mosca-branca, ácaro",sp:[["Caipira",60],["Japonês",55]]},
+{k:"repolho",n:"Repolho",w:2,f:15,t:"Sol pleno e solo rico e firme.",fert:"Composto + esterco curtido",pg:"lagartas, pulgão, traça",sp:[["Verde",90],["Roxo",100]]},
+{k:"brocolis",n:"Brócolis",w:2,f:15,t:"Colha a cabeça central antes de as flores amarelas abrirem.",fert:"Composto rico em nitrogênio",pg:"lagartas, pulgão, mosca-branca",sp:[["Ramoso",80],["Cabeça única",90]]},
+{k:"rabanete",n:"Rabanete",w:1,f:20,t:"Ciclo rápido. Não deixe a terra secar.",fert:"Composto leve (pouco nitrogênio)",pg:"pulga-saltão, lesmas",sp:[["Redondo",30],["Comprido",40]]},
+{k:"abobrinha",n:"Abobrinha",w:2,f:14,t:"Sol pleno e bastante espaço. Colha ainda jovem.",fert:"Composto + esterco curtido",pg:"oídio, mosca-branca, vaquinha",sp:[["Italiana",50],["Brasileira",55]]},
+{k:"salsa",n:"Salsa",w:2,f:20,t:"Germina devagar. Meia sombra no calor.",fert:"Húmus de minhoca",pg:"pulgão, lagartas",sp:[["Crespa",70],["Lisa",70]]},
+{k:"espinafre",n:"Espinafre",w:2,f:15,t:"Prefere clima ameno e rega regular.",fert:"Composto rico em nitrogênio",pg:"minador, pulgão",sp:[["Nova Zelândia",55],["Comum",50]]},
+{k:"outra",n:"Outra",w:2,f:15,t:"Preencha os prazos conforme a embalagem da semente ou muda.",fert:"Composto orgânico",pg:"consulte um viveiro",sp:[["Personalizada",70]]}
+];
+const IC={
+alface:"<circle cx='32' cy='36' r='20' fill='#6fbf4a'/><circle cx='24' cy='30' r='11' fill='#8fd35f'/><circle cx='40' cy='30' r='11' fill='#8fd35f'/><circle cx='32' cy='40' r='11' fill='#a8e27c'/>",
+rucula:"<path d='M32 58V30' stroke='#2f6b3a' stroke-width='3'/><ellipse cx='32' cy='22' rx='7' ry='15' fill='#3e8e41'/><ellipse cx='20' cy='32' rx='6' ry='12' transform='rotate(-30 20 32)' fill='#4fa34c'/><ellipse cx='44' cy='32' rx='6' ry='12' transform='rotate(30 44 32)' fill='#4fa34c'/>",
+couve:"<path d='M32 58V40' stroke='#7bb661' stroke-width='4'/><path d='M32 6C8 14 8 42 32 48 56 42 56 14 32 6Z' fill='#2b7a46'/><path d='M32 10V44' stroke='#bfe3a6' stroke-width='2'/>",
+tomate:"<circle cx='32' cy='36' r='21' fill='#e5412d'/><path d='M32 17l-9 6 9-2 9 2z' fill='#2f8a3a'/><rect x='30' y='9' width='4' height='9' fill='#2f8a3a'/>",
+cenoura:"<path d='M32 18L24 4M32 18V2M32 18L40 4' stroke='#3e9a3e' stroke-width='4' stroke-linecap='round'/><path d='M23 18H41L34 58Q32 62 30 58Z' fill='#f28a1f'/>",
+pimentao:"<path d='M32 14C12 14 10 40 20 54Q32 62 44 54C54 40 52 14 32 14Z' fill='#4caf50'/><rect x='29' y='5' width='6' height='11' rx='3' fill='#2e7d32'/>",
+cebolinha:"<g stroke='#3fa04b' stroke-width='4' stroke-linecap='round'><path d='M22 56L18 8M28 56V6M34 56L38 8M40 56L48 14'/></g><rect x='16' y='44' width='34' height='7' rx='3' fill='#e9e4d3'/>",
+manjericao:"<path d='M32 58V32' stroke='#2a6b35' stroke-width='3'/><ellipse cx='20' cy='24' rx='13' ry='9' transform='rotate(-25 20 24)' fill='#3f9b4b'/><ellipse cx='44' cy='24' rx='13' ry='9' transform='rotate(25 44 24)' fill='#57b25f'/><ellipse cx='32' cy='14' rx='8' ry='11' fill='#3f9b4b'/>",
+beterraba:"<path d='M32 22L26 6M32 22L38 4' stroke='#3e9a3e' stroke-width='4' stroke-linecap='round'/><circle cx='32' cy='38' r='18' fill='#8e1b4d'/><path d='M32 55v7' stroke='#8e1b4d' stroke-width='3'/>",
+pepino:"<rect x='6' y='25' width='52' height='16' rx='8' transform='rotate(-20 32 33)' fill='#3c9d4a'/><g fill='#8fd18a'><circle cx='20' cy='36' r='1.8'/><circle cx='32' cy='32' r='1.8'/><circle cx='44' cy='27' r='1.8'/></g>",
+repolho:"<circle cx='32' cy='34' r='24' fill='#9bd36a'/><path d='M32 10C18 20 18 48 32 58M32 10C46 20 46 48 32 58M10 34H54' stroke='#5a9e3a' stroke-width='2' fill='none'/>",
+brocolis:"<rect x='27' y='34' width='10' height='24' rx='4' fill='#8cc56b'/><circle cx='20' cy='28' r='11' fill='#2f8a46'/><circle cx='32' cy='20' r='13' fill='#3a9b52'/><circle cx='44' cy='28' r='11' fill='#2f8a46'/>",
+rabanete:"<path d='M32 22L24 6M32 22L40 8' stroke='#3e9a3e' stroke-width='4' stroke-linecap='round'/><circle cx='32' cy='38' r='17' fill='#d6336c'/><path d='M32 54v8' stroke='#f3dede' stroke-width='3'/>",
+abobrinha:"<rect x='5' y='24' width='54' height='20' rx='10' transform='rotate(-15 32 34)' fill='#4f9a45'/><path d='M50 20l6-6' stroke='#2e6b2c' stroke-width='5' stroke-linecap='round'/>",
+salsa:"<path d='M32 58V34' stroke='#2f6b3a' stroke-width='3'/><circle cx='20' cy='26' r='10' fill='#2f8a3a'/><circle cx='44' cy='26' r='10' fill='#3a9b45'/><circle cx='32' cy='16' r='11' fill='#49ac52'/>",
+espinafre:"<path d='M32 8C8 16 8 46 32 56 56 46 56 16 32 8Z' fill='#1f6e3a'/><path d='M32 56V14' stroke='#8ccf9a' stroke-width='2'/>",
+outra:"<path d='M32 58V30' stroke='#2a6b35' stroke-width='4'/><ellipse cx='21' cy='26' rx='13' ry='8' transform='rotate(-30 21 26)' fill='#5cb85c'/><ellipse cx='43' cy='20' rx='13' ry='8' transform='rotate(30 43 20)' fill='#4caf50'/>"};
+const ico=k=>`<svg viewBox="0 0 64 64" aria-hidden="true">${IC[k]||IC.outra}</svg>`;
+const pk=p=>p.k||(PRESETS.find(z=>z.n===p.preset)||{k:"outra"}).k;
+const FERTS=["Húmus de minhoca","Composto orgânico","Esterco curtido","Bokashi","Cinza de madeira","Farinha de ossos","NPK 10-10-10","Adubo foliar"];
+const PESTS=["Pulgão","Lesma/caracol","Lagarta","Mosca-branca","Ácaro","Cochonilha","Oídio (mofo branco)","Formiga","Outra"];
+const CURES=["Óleo de neem","Sabão potássico","Catação manual","Armadilha (cerveja ou amarela)","Calda de bicarbonato","Remoção das folhas afetadas"];
+const opts=a=>a.map(s=>`<option>${s}</option>`).join("");
+function panels(p){return `<div class="det"><b>🌿 Adubação</b><div class="row" style="margin-top:6px"><select id="fs-${p.id}" data-fs="${p.id}" style="flex:1;min-width:150px">${FD.map(x=>`<option value="${x.k}">${x.n}</option>`).join("")}</select><select id="ft-${p.id}" style="display:none;flex:1;min-width:90px">${opts(FD[2].tp)}</select><input type="number" min="0" step="any" id="fq-${p.id}" placeholder="Quantidade" style="flex:1;min-width:100px"><span id="fu-${p.id}" class="mut">${FD[0].u}</span><button class="b-f" data-a="fertlog" data-id="${p.id}">Registrar</button><div class="mut" id="fh-${p.id}" style="flex-basis:100%">${fhint(FD[0])}</div></div></div><div class="det"><b>🐛 Controle de pragas</b><div class="row" style="margin-top:6px"><select id="ps-${p.id}">${opts(PESTS)}</select><select id="pt-${p.id}">${opts(CURES)}</select></div><div class="row" style="margin-top:6px"><button class="b-p" data-a="pestlog" data-id="${p.id}">Registrar praga</button><button data-a="inspect" data-id="${p.id}">🔍 Inspecionei: tudo limpo</button></div></div>`}
+const DAY=864e5;
+let S={plants:[]};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function load(){try{const r=localStorage.getItem("horta-v1");if(r)S=JSON.parse(r)}catch(e){}}
+function save(){try{localStorage.setItem("horta-v1",JSON.stringify(S))}catch(e){}}
+const sod=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+const today=()=>sod(Date.now());
+const dstr=t=>new Date(t).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+function parseDate(v){const[a,b,c]=v.split("-").map(Number);return new Date(a,b-1,c).getTime()}
+function last(p,type){const l=p.log.filter(x=>type==="inspect"?(x.type==="inspect"||x.type==="pest"):x.type===type);return l.length?Math.max(...l.map(x=>x.t)):parseDate(p.planted)}
+function dueIn(p,type){const ev=type==="water"?p.water:type==="feed"?p.feed:(p.inspect||7);return ev-Math.floor((today()-sod(last(p,type)))/DAY)}
+function chip(p,type){const d=dueIn(p,type),ic=type==="water"?"💧 Rega":type==="feed"?"🌿 Adubo":"🔍 Inspeção";
+ if(d<0)return `<span class="chip late">${ic} atrasada ${-d} dia${d<-1?"s":""}</span>`;
+ if(d===0)return `<span class="chip late">${ic} hoje</span>`;
+ return `<span class="chip">${ic} em ${d} dia${d>1?"s":""}</span>`}
+function age(p){return Math.max(0,Math.floor((today()-parseDate(p.planted))/DAY))}
+
+function render(){renderExtra();
+  $("date").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});
+  const tasks=[];
+  S.plants.forEach(p=>{
+    if(dueIn(p,"water")<=0)tasks.push({p,type:"water"});
+    if(dueIn(p,"feed")<=0)tasks.push({p,type:"feed"});
+    if(dueIn(p,"inspect")<=0)tasks.push({p,type:"inspect"});
+    if(age(p)>=p.harvest)tasks.push({p,type:"harvest"});
+  });
+  $("today").innerHTML=!S.plants.length?`<div class="empty">Nenhuma planta ainda. Adicione a primeira lá embaixo.</div>`:
+   tasks.length?tasks.map(t=>{
+    const lbl=t.type==="water"?"💧 Regar":t.type==="feed"?"🌿 Adubar":t.type==="inspect"?"🔍 Inspecionar pragas":"🧺 Pronta para colher";
+    const btn=t.type==="harvest"?"":`<button class="${t.type==="water"?"b-w":"b-f"}" data-a="${t.type}" data-id="${t.p.id}">Feito</button>`;
+    return `<div class="task"><span>${lbl}: <b>${esc(t.p.name)}</b></span>${btn}</div>`}).join(""):
+   `<div class="task"><span>Tudo em dia. Suas plantas agradecem 🌞</span></div>`;
+
+  $("plants").innerHTML=S.plants.length?S.plants.map(p=>{
+    const a=age(p),pct=Math.min(100,Math.round(a/p.harvest*100));
+    const hs=p.log.filter(x=>x.type==="height").sort((x,y)=>x.t-y.t);
+    const cur=hs.length?hs[hs.length-1].v+" cm":"sem medida";
+    return `<div class="card" data-id="${p.id}">
+     ${p.photo?`<img class='cover' src='${p.photo}' alt='Foto de ${esc(p.name)}'>`:''}<div class="head"><span class="ico">${ico(pk(p))}</span><div><div class="name">${esc(p.name)}</div><div class="mut">${esc(p.preset)}${p.spec?" · "+esc(p.spec):""}</div><div class="mut">Dia ${a} · altura: ${cur}${hvTxt(p)}</div></div></div>
+     <div class="bar"><i style="width:${pct}%"></i></div>
+     <div class="mut">${pct>=100?"Hora de colher!":`${pct}% do ciclo · colheita em ~${Math.max(0,p.harvest-a)} dias`}</div>
+     <div class="row" style="margin:10px 0">${chip(p,"water")}${chip(p,"feed")}${chip(p,"inspect")}</div>
+     <div class="row"><button class="b-w" data-a="water" data-id="${p.id}">💧 Reguei</button><button class="b-f" data-a="feed" data-id="${p.id}">🌿 Adubei</button><button class="b-g" data-a="guide" data-id="${p.id}">${p.gopen?"Fechar passo a passo":"📋 Passo a passo"}</button><button data-a="more" data-id="${p.id}">${p.open?"Fechar":"Medir e histórico"}</button></div>${p.gopen?guide(p):nextStep(p)}
+     ${p.open?detail(p,hs):""}
+    </div>`}).join(""):"";
+}
+function detail(p,hs){
+  const lg=[...p.log].sort((x,y)=>y.t-x.t).slice(0,30).map(x=>{
+    const k={water:"💧 Regou",feed:"🌿 Adubou"+(x.v?" ("+esc(x.v)+")":""),harvest:"🧺 Colheu "+esc(x.v||""),inspect:"🔍 Inspeção: sem pragas",pest:"🐛 "+esc(x.v||"Praga registrada"),height:"📏 Altura "+x.v+" cm",note:"📝 "+esc(x.v||"")}[x.type];
+    return `<li>${dstr(x.t)} · ${k}</li>`}).join("")||"<li class='mut'>Sem registros ainda.</li>";
+  const pr=PRESETS.find(z=>z.n===p.preset);
+  return `<div class="det">
+   ${pr?`<div class="tip">${esc(pr.t)}<br><b>Adubo indicado:</b> ${esc(pr.fert)}<br><b>Pragas comuns:</b> ${esc(pr.pg)}</div>`:""}
+   ${chart(p,hs)}${perfPanel(p,hs)}${panels(p)}${panels2(p)}
+   <div class="row" style="margin:8px 0"><input type="number" step="0.1" min="0" placeholder="Altura hoje (cm)" id="h-${p.id}" style="flex:1;min-width:120px"><button class="b-p" data-a="height" data-id="${p.id}">Salvar altura</button></div>
+   <div class="row"><input id="n-${p.id}" placeholder="Anotação (pragas, poda, folhas...)" style="flex:1;min-width:120px"><button data-a="note" data-id="${p.id}">Anotar</button></div>
+   <ul class="log">${lg}</ul>
+   <button data-a="del" data-id="${p.id}" style="color:var(--warn)">Remover planta</button>
+  </div>`}
+function chart(p,hs){
+  if(hs.length<2)return `<p class="mut">Registre a altura em pelo menos 2 dias para ver o gráfico de crescimento.</p>`;
+  const W=320,H=130,m=28,t0=hs[0].t,t1=hs[hs.length-1].t,mx=Math.max(...hs.map(x=>x.v))*1.1||1;
+  const X=t=>m+(t1===t0?0:(t-t0)/(t1-t0))*(W-m-8),Y=v=>H-20-(v/mx)*(H-34);
+  const pts=hs.map(x=>X(x.t)+","+Y(x.v)).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico de altura ao longo do tempo">
+   <line x1="${m}" y1="${H-20}" x2="${W-8}" y2="${H-20}" stroke="var(--bd)"/><line x1="${m}" y1="${Y(0)-(H-34)}" x2="${m}" y2="${H-20}" stroke="var(--bd)"/>
+   <polyline points="${pts}" fill="none" stroke="var(--leaf)" stroke-width="3" stroke-linejoin="round"/>
+   ${hs.map(x=>`<circle cx="${X(x.t)}" cy="${Y(x.v)}" r="4" fill="var(--sprout)" stroke="var(--leaf)" stroke-width="2"/>`).join("")}
+   <text x="${m-4}" y="${Y(mx/1.1)+4}" font-size="10" text-anchor="end" fill="var(--mut)">${Math.round(mx/1.1)}</text>
+   <text x="${m}" y="${H-5}" font-size="10" fill="var(--mut)">${dstr(t0)}</text><text x="${W-8}" y="${H-5}" font-size="10" text-anchor="end" fill="var(--mut)">${dstr(t1)}</text>
+   <text x="${m+4}" y="10" font-size="10" fill="var(--mut)">cm</text></svg>`}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button[data-a]");if(!b)return;
+  const p=S.plants.find(x=>x.id===b.dataset.id);if(!p)return;
+  const a=b.dataset.a,now=Date.now();
+  if(a==="water"||a==="inspect")p.log.push({t:now,type:a});
+  else if(a==="feed")p.log.push({t:now,type:"feed",v:(PRESETS.find(z=>z.n===p.preset)||{}).fert});
+  else if(a==="more")p.open=!p.open;
+  else if(a==="guide")p.gopen=!p.gopen;
+  else if(a==="stage")p.sel=+b.dataset.s;
+  else if(a==="finish"){const s=stg(p),all=STEPS[s].items.every((_,i)=>(p.done||{})[s+'.'+i]);p.done=p.done||{};STEPS[s].items.forEach((_,i)=>p.done[s+'.'+i]=!all)}
+  else if(a==="harvest"){const v=parseFloat($('hq-'+p.id).value),u=$('hu-'+p.id).value;if(!(v>0)){$('hq-'+p.id).focus();return}p.log.push({t:now,type:'harvest',v:v+' '+u,q:v,u})}
+  else if(a==="edit"){const g=i=>$(i+p.id).value;p.name=g('en-')||p.name;p.spec=g('es-');p.planted=g('ed-')||p.planted;p.harvest=Math.max(1,+g('eh-')||p.harvest);p.water=Math.max(1,+g('ew-')||p.water);p.feed=Math.max(1,+g('ef-')||p.feed);p.inspect=Math.max(1,+g('ei-')||7)}
+  else if(a==="rmphoto")delete p.photo;
+  else if(a==="fertlog"){const d=FD.find(x=>x.k===$('fs-'+p.id).value),q=parseFloat($('fq-'+p.id).value);if(!(q>0)){$('fq-'+p.id).focus();return}const tp=d.tp?$('ft-'+p.id).value:'',g=q*d.gu,np=tp?tp.split('-').map(Number):[d.N||0,d.P||0,d.K||0],nu=np.map(x=>+(g*x/100).toFixed(3));p.log.push({t:now,type:'feed',f:d.k,fn:d.n,q,u:d.u,tp,nu,v:d.n+(tp?' '+tp:'')+' · '+q+' '+d.u+(d.max&&q>d.max?' (acima da dose segura)':'')})}
+  else if(a==="pestlog")p.log.push({t:now,type:"pest",v:$("ps-"+p.id).value+" → "+$("pt-"+p.id).value});
+  else if(a==="height"){const v=parseFloat($("h-"+p.id).value);if(isNaN(v)||v<0){$("h-"+p.id).focus();return}p.log.push({t:now,type:"height",v})}
+  else if(a==="note"){const v=$("n-"+p.id).value.trim();if(!v)return;p.log.push({t:now,type:"note",v})}
+  else if(a==="del"){if(!confirm("Remover "+p.name+" e todo o histórico?"))return;S.plants=S.plants.filter(x=>x!==p)}
+  save();render();
+});
+
+PRESETS.forEach((x,i)=>{const o=document.createElement("option");o.value=i;o.textContent=x.n;$("preset").appendChild(o)});
+function fillSp(){const x=PRESETS[$("preset").value];$("pspec").innerHTML=x.sp.map((s,i)=>`<option value="${i}">${s[0]}</option>`).join("");$("pwater").value=x.w;$("pfeed").value=x.f;$("pico").innerHTML=ico(x.k);$("ptip").textContent=x.t+" Pragas comuns: "+x.pg+".";fill()}
+function fill(){const x=PRESETS[$("preset").value];$("pharv").value=x.sp[$("pspec").value][1]}
+$("preset").addEventListener("change",fillSp);$("pspec").addEventListener("change",fill);
+$("add").addEventListener("click",()=>{
+  const x=PRESETS[$("preset").value];
+  const v=id=>Math.max(1,parseInt($(id).value)||1);
+  S.plants.push({id:"p"+Date.now(),preset:x.n,k:x.k,spec:x.sp[$("pspec").value][0],inspect:7,name:$("pname").value.trim()||x.n,planted:$("pdate").value,water:v("pwater"),feed:v("pfeed"),harvest:v("pharv"),log:[],open:false});
+  $("pname").value="";save();render();
+  closeSheet();setTab('plants');
+});
+const d=new Date();$("pdate").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+document.addEventListener('change',e=>{const i=e.target,id=i.dataset&&i.dataset.ph;if(!id||!i.files[0])return;const p=S.plants.find(x=>x.id===id),r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);p.photo=c.toDataURL('image/jpeg',.8);save();render()};im.src=r.result};r.readAsDataURL(i.files[0])});
+function hvTxt(p){const t={};p.log.forEach(x=>{if(x.type==='harvest'&&x.q)t[x.u]=(t[x.u]||0)+x.q});const s=Object.entries(t).map(([u,q])=>(+q.toFixed(2))+' '+u).join(' + ');return s?' · colhido: '+s:''}
+function panels2(p){return `<div class='det'><b>🧺 Colheita</b><div class='row' style='margin-top:6px'><input type='number' min='0' step='any' id='hq-${p.id}' placeholder='Quantidade' style='flex:1;min-width:100px'><select id='hu-${p.id}' style='flex:1;min-width:100px'><option>unidades</option><option>g</option><option>kg</option><option>maços</option></select><button class='b-p' data-a='harvest' data-id='${p.id}'>Registrar</button></div></div><div class='det'><b>📷 Foto e edição</b><div class='row' style='margin:6px 0'><input type='file' accept='image/*' data-ph='${p.id}' style='flex:1'>${p.photo?`<button data-a='rmphoto' data-id='${p.id}'>Remover foto</button>`:''}</div><div class='grid'><div><label>Nome</label><input id='en-${p.id}' value='${esc(p.name)}'></div><div><label>Espécie</label><input id='es-${p.id}' value='${esc(p.spec||'')}'></div><div><label>Plantio</label><input type='date' id='ed-${p.id}' value='${p.planted}'></div><div><label>Dias até colher</label><input type='number' id='eh-${p.id}' value='${p.harvest}'></div><div><label>Regar a cada (dias)</label><input type='number' id='ew-${p.id}' value='${p.water}'></div><div><label>Adubar a cada (dias)</label><input type='number' id='ef-${p.id}' value='${p.feed}'></div><div><label>Inspecionar a cada (dias)</label><input type='number' id='ei-${p.id}' value='${p.inspect||7}'></div></div><button class='b-p' style='margin-top:8px' data-a='edit' data-id='${p.id}'>Salvar alterações</button></div>`}
+const CC={water:'var(--water)',feed:'var(--feed)',pest:'var(--warn)',inspect:'#8e6bbf',harvest:'#e08a1e',height:'var(--leaf)'};
+const EL={water:'💧 Regar',feed:'🌿 Adubar',pest:'🐛 Praga',inspect:'🔍 Inspecionar',harvest:'🧺 Colher',height:'📏 Medir'};
+let cm=new Date(),sel=today();
+function evs(){const m={},add=(t,p,ty,pr,v)=>{const k=sod(t);(m[k]=m[k]||[]).push({p,ty,pr,v})};S.plants.forEach(p=>{p.log.forEach(x=>{if(x.type!=='note')add(x.t,p,x.type,0,x.v)});['water','feed','inspect'].forEach(ty=>{const ev=ty==='water'?p.water:ty==='feed'?p.feed:(p.inspect||7);add(Math.max(today(),sod(last(p,ty))+ev*DAY)+432e5,p,ty,1)});add(parseDate(p.planted)+p.harvest*DAY+432e5,p,'harvest',1)});return m}
+function renderCal(){const y=cm.getFullYear(),mo=cm.getMonth(),f=new Date(y,mo,1).getDay(),n=new Date(y,mo+1,0).getDate(),E=evs();let h=`<div class='row' style='justify-content:space-between'><button data-c='-1' aria-label='Mês anterior'>‹</button><b>${cm.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</b><button data-c='1' aria-label='Próximo mês'>›</button></div><div class='cg'>`+['D','S','T','Q','Q','S','S'].map(d=>`<span class='mut'>${d}</span>`).join('');for(let i=0;i<f;i++)h+='<span></span>';for(let d=1;d<=n;d++){const t=new Date(y,mo,d).getTime(),dots=[...new Set((E[t]||[]).map(e=>e.ty))].slice(0,4).map(ty=>`<i style='background:${CC[ty]}'></i>`).join('');h+=`<button class='cd${t===sel?' on':''}${t===today()?' td':''}' data-d='${t}'>${d}<span>${dots}</span></button>`}const L=E[sel]||[];h+=`</div><div style='margin-top:10px'><b>${new Date(sel).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</b>`+(L.length?L.map(e=>`<div class='task'><span>${EL[e.ty]} · ${esc(e.p.name)}${e.v&&!e.pr?' ('+esc(e.v)+(e.ty==='height'?' cm':'')+')':''}</span><span class='mut'>${e.pr?'previsto':'feito'}</span></div>`).join(''):`<div class='mut'>Nada neste dia.</div>`)+'</div>';$('cal').innerHTML=h}
+$('cal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.c)cm=new Date(cm.getFullYear(),cm.getMonth()+ +b.dataset.c,1);else if(b.dataset.d)sel=+b.dataset.d;renderCal()});
+const PL={alface:'011111111111',rucula:'111111111111',couve:'011111111100',tomate:'100000011111',cenoura:'011111111111',pimentao:'100000011111',cebolinha:'111111111111',manjericao:'111000011111',beterraba:'001111111000',pepino:'111000011111',repolho:'001111110000',brocolis:'001111110000',rabanete:'111111111111',abobrinha:'111000011111',salsa:'011111111110',espinafre:'001111110000'};
+function renderNow(){const mo=new Date().getMonth(),ok=PRESETS.filter(x=>(PL[x.k]||'')[mo]==='1');$('now').innerHTML=`<div class='mut'>Boas opções para semear ou transplantar em ${new Date().toLocaleDateString('pt-BR',{month:'long'})} (clima do Centro-Sul do Brasil; varia conforme a região). Toque para ir ao cadastro.</div><div class='row' style='margin-top:8px'>`+ok.map(x=>`<button data-pk='${x.k}' class='row' style='gap:6px;padding:4px 10px 4px 4px'><span class='ico' style='width:32px;height:32px;padding:2px'>${ico(x.k)}</span>${x.n}</button>`).join('')+'</div>'}
+$('now').addEventListener('click',e=>{const b=e.target.closest('[data-pk]');if(!b)return;$('preset').value=PRESETS.findIndex(x=>x.k===b.dataset.pk);fillSp();openSheet()});
+function renderExtra(){renderCal();renderNow();renderPerf()}
+$('bk').addEventListener('click',async()=>{const s=JSON.stringify(S);try{await navigator.clipboard.writeText(s);$('inf').textContent='Backup copiado. Guarde em um lugar seguro.'}catch(e){$('rs').value=s;$('inf').textContent='Não consegui copiar sozinho: copie o texto da caixa acima.'}});
+$('rsb').addEventListener('click',()=>{try{const o=JSON.parse($('rs').value);if(!Array.isArray(o.plants))throw 0;S=o;save();render();$('inf').textContent='Backup restaurado.'}catch(e){$('inf').textContent='Texto de backup inválido.'}});
+function notify(){try{if(!('Notification' in window)||Notification.permission!=='granted')return;const n=S.plants.reduce((a,p)=>a+(dueIn(p,'water')<=0)+(dueIn(p,'feed')<=0)+(dueIn(p,'inspect')<=0),0);if(n)new Notification('Calendário da Horta',{body:n+' tarefa(s) para hoje'})}catch(e){}}
+$('nt').addEventListener('click',async()=>{try{const r=await Notification.requestPermission();$('inf').textContent=r==='granted'?'Lembretes ativados: o aviso aparece quando você abrir o app.':'Permissão negada pelo navegador.';notify()}catch(e){$('inf').textContent='Este navegador não permite lembretes aqui.'}});
+let dp;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('inst').hidden=false});
+$('inst').addEventListener('click',async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;$('inst').hidden=true});
+try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+if(!document.querySelector('link[rel=manifest]')){try{const sv="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='#2f6b3a'/><path d='M256 420V230' stroke='#b7d94c' stroke-width='24' stroke-linecap='round'/><ellipse cx='190' cy='210' rx='80' ry='46' transform='rotate(-30 190 210)' fill='#b7d94c'/><ellipse cx='322' cy='170' rx='80' ry='46' transform='rotate(30 322 170)' fill='#8fd35f'/></svg>",mf={name:'Calendário da Horta',short_name:'Horta',start_url:location.href.split('#')[0],display:'standalone',background_color:'#e9f0e1',theme_color:'#2f6b3a',icons:[{src:'data:image/svg+xml,'+encodeURIComponent(sv),sizes:'any',type:'image/svg+xml'}]},l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}));document.head.appendChild(l)}catch(e){}}
+const FD=[
+{k:'cafe',n:'Pó de café (borra seca)',u:'colher de sopa',gu:5,N:2,P:.3,K:.3,ref:1,max:2,note:'Use seco e misturado à terra; em excesso compacta o solo.'},
+{k:'ovo',n:'Casca de ovo triturada',u:'casca(s)',gu:5,N:1,P:.4,K:.1,ref:2,max:4,note:'Fornece cálcio, de ação lenta. Triture bem fino.'},
+{k:'npk',n:'NPK (escolha a fórmula)',u:'g',gu:1,tp:['10-10-10','4-14-8','20-05-20','04-30-10','20-10-10'],ref:3,max:6,note:'Aplique longe do caule e regue em seguida.'},
+{k:'ureia',n:'Ureia (45% de N)',u:'g',gu:1,N:45,P:0,K:0,ref:1,max:2,note:'Muito concentrada: longe do caule e regue em seguida; excesso queima as raízes.'},
+{k:'humus',n:'Húmus de minhoca',u:'g',gu:1,N:1.5,P:1,K:1,ref:100,max:250},
+{k:'comp',n:'Composto orgânico',u:'g',gu:1,N:1.5,P:1,K:1,ref:150,max:300},
+{k:'esterco',n:'Esterco curtido',u:'g',gu:1,N:1.5,P:1,K:1.5,ref:150,max:300,note:'Só use bem curtido (sem cheiro forte).'},
+{k:'bokashi',n:'Bokashi',u:'colher de sopa',gu:15,N:2,P:1,K:1,ref:1,max:2},
+{k:'cinza',n:'Cinza de madeira',u:'colher de sopa',gu:10,N:0,P:1,K:5,ref:1,max:2,note:'Eleva o pH: use pouco.'},
+{k:'ossos',n:'Farinha de ossos',u:'colher de sopa',gu:15,N:3,P:15,K:0,ref:1,max:2},
+{k:'foliar',n:'Adubo foliar',u:'ml',gu:1,N:0,P:0,K:0,note:'Dilua conforme o rótulo; aplique cedo ou no fim da tarde.'}];
+const fhint=d=>'Dose de referência por planta ou vaso médio: '+(d.ref?d.ref+' '+d.u+' (máx. '+d.max+')':'conforme o rótulo')+'. Valores aproximados; confira a embalagem. '+(d.note||'');
+document.addEventListener('change',e=>{const s=e.target,id=s.dataset&&s.dataset.fs;if(!id)return;const d=FD.find(x=>x.k===s.value);$('fu-'+id).textContent=d.u;$('fh-'+id).textContent=fhint(d);$('ft-'+id).style.display=d.tp?'':'none'});
+const slope=m=>m.length<2?null:(m[1].v-m[0].v)/Math.max(1,(m[1].t-m[0].t)/DAY);
+function effects(p){const hs=p.log.filter(x=>x.type==='height').sort((a,b)=>a.t-b.t),fs=p.log.filter(x=>x.type==='feed'&&x.f).sort((a,b)=>a.t-b.t);return fs.map((a,i)=>{const nx=fs[i+1]?fs[i+1].t:Infinity,pre=hs.filter(h=>h.t<=a.t),post=hs.filter(h=>h.t>a.t&&h.t<nx),b=slope(pre.slice(-2)),c=post.length>1?slope(post):post.length&&pre.length?slope([pre[pre.length-1],post[0]]):null;return b>0&&c!==null?{n:a.fn,g:(c-b)/b}:null}).filter(Boolean)}
+function agg(l){const m={};l.forEach(x=>{(m[x.n]=m[x.n]||[]).push(x.g)});return Object.entries(m).map(([n,a])=>({n,k:a.length,g:a.reduce((s,v)=>s+v,0)/a.length})).sort((x,y)=>y.g-x.g)}
+const conf=k=>k>=5?'boa':k>=3?'média':'baixa',pct=g=>(g>=0?'+':'')+Math.round(g*100)+'%';
+function proj(p,hs){if(hs.length<2)return null;const a=hs[Math.max(0,hs.length-3)],b=hs[hs.length-1];return{r:(b.v-a.v)/Math.max(1,(b.t-a.t)/DAY),cur:b.v,left:Math.max(0,Math.min(120,p.harvest-age(p)))}}
+function perfPanel(p,hs){const tn=p.log.filter(x=>x.type==='feed'&&x.nu).reduce((a,x)=>a.map((v,i)=>v+x.nu[i]),[0,0,0]),pj=proj(p,hs);let h=`<div class='det'><b>📈 Desempenho e evolução</b><div class='mut'>Nutrientes aplicados (aprox.): N ${tn[0].toFixed(2)} g · P ${tn[1].toFixed(2)} g · K ${tn[2].toFixed(2)} g</div>`;if(!pj)return h+`<p class='mut'>Meça a altura em pelo menos 2 datas para ver a projeção de crescimento.</p></div>`;const G=agg(S.plants.flatMap(effects)),A=agg(effects(p)),f=(g,d)=>(pj.cur+Math.max(0,pj.r*(1+g))*d).toFixed(1);h+=`<div style='overflow-x:auto'><table class='tb'><tr><th>Cenário</th><th>Ganho</th><th>+14 dias</th><th>Na colheita</th></tr><tr><td>Tendência atual</td><td>—</td><td>${f(0,14)} cm</td><td>${f(0,pj.left)} cm</td></tr>`+G.map(x=>{const s=A.find(y=>y.n===x.n)||x,g=Math.max(-.5,Math.min(1,s.g));return `<tr><td>${esc(x.n)}</td><td>${pct(s.g)} <span class='mut'>(${conf(s.k)})</span></td><td>${f(g,14)} cm</td><td>${f(g,pj.left)} cm</td></tr>`}).join('')+`</table></div><p class='mut'>Ritmo recente: ${pj.r.toFixed(2)} cm/dia. ${G.length?'O ganho de cada adubo é o que seus registros mostram (nesta planta, ou nas outras se ainda não houver dados aqui).':'Registre adubos com quantidade e meça a altura antes e depois para comparar.'} É uma estimativa linear baseada nos seus dados, não prova causa, e tende a ser otimista perto do fim do ciclo.</p></div>`;return h}
+function renderPerf(){const G=agg(S.plants.flatMap(effects));$('perf').innerHTML=G.length?`<div class='mut'>Mudança no ritmo de crescimento (cm/dia) depois de cada adubo, comparada ao ritmo anterior, em todas as suas plantas.</div>`+G.map(x=>`<div class='task'><span><b>${esc(x.n)}</b> <span class='mut'>${x.k} aplicação(ões)</span></span><span>${pct(x.g)} <span class='mut'>${conf(x.k)}</span></span></div>`).join('')+`<p class='mut'>Clima, estação e a fase da planta também mudam o ritmo; quanto mais medições, mais confiável.</p>`:`<div class='mut'>Registre a altura antes e depois de adubar (com a quantidade) em cada planta. O app compara o ritmo de crescimento e mostra qual adubo rendeu mais.</div>`}
+const STEPS=[
+{i:'🌱',n:'Plantio',f:'umidade constante e luz certa para a semente ou muda pegar.',items:['Preparar o solo: misture composto ou húmus e deixe-o solto e bem drenado.','Plantar na profundidade certa (cerca de 2 a 3 vezes o tamanho da semente) e cobrir levemente.','Regar com jato fino logo depois; manter úmido, sem encharcar. Depois, regar a cada {w} dia(s).','Posicionar na luz ideal. Dica: {t}','Registrar a primeira medida de altura no app.']},
+{i:'🪴',n:'Muda',f:'raízes fortes e proteção contra pragas.',items:['Desbastar as mudas muito juntas, deixando a mais forte.','Teste do dedo: se o solo estiver seco a 2 cm de profundidade, regar.','Primeira inspeção de pragas. Comuns nesta planta: {pg}.','Retirar ervas daninhas ao redor.','Medir a altura 1 vez por semana.']},
+{i:'🌿',n:'Crescimento',f:'nutrição na hora certa e medições para o app calcular o que funciona.',items:['Adubar a cada {f} dias. Indicado: {fert}. Meça a altura antes e depois.','Colocar cobertura morta (palha seca) para segurar a umidade.','Inspecionar pragas a cada 7 dias e agir cedo (óleo de neem, sabão potássico, catação).','Retirar folhas amareladas ou danificadas.','Medir a altura toda semana e registrar o adubo com a quantidade.']},
+{i:'🍅',n:'Maturação',f:'rega regular e atenção ao ponto de colheita.',items:['Manter a rega regular, sem alternar entre seco e encharcado.','Em plantas de fruto (tomate, pimentão, pepino, abobrinha), reduzir nitrogênio e reforçar fósforo e potássio. Folhosas seguem com adubo leve.','Conferir os sinais de ponto: tamanho, cor e firmeza.','Continuar inspecionando pragas e fungos.','Separar ferramentas limpas e planejar a colheita para a manhã.']},
+{i:'🧺',n:'Colheita',f:'colher no ponto e preparar o próximo ciclo.',items:['Colher de manhã cedo, com ferramenta limpa.','Registrar a quantidade colhida no app.','Se a planta rebrota (couve, cebolinha, manjericão, alface em folhas), colher só parte e dar adubo leve.','Retirar os restos da planta e renovar o solo com composto.','Fazer rodízio: não repetir a mesma hortaliça no mesmo local.']}];
+const fill2=(s,p)=>{const d=PRESETS.find(z=>z.n===p.preset)||PRESETS[PRESETS.length-1];return s.replace('{w}',p.water).replace('{f}',p.feed).replace('{fert}',d.fert).replace('{pg}',d.pg).replace('{t}',d.t)};
+const cur=p=>{const r=age(p)/p.harvest;return r>=1?4:r>=.65?3:r>=.35?2:r>=.15?1:0},stg=p=>p.sel!==undefined?p.sel:cur(p);
+function nextStep(p){const s=cur(p),D=p.done||{},i=STEPS[s].items.findIndex((_,k)=>!D[s+'.'+k]);return i<0?`<div class='nx'>✅ Etapa “${STEPS[s].n}” em dia. Abra o passo a passo para ver o que vem a seguir.</div>`:`<div class='nx'><b>${STEPS[s].i} Próximo passo:</b> ${esc(fill2(STEPS[s].items[i],p))}</div>`}
+function guide(p){const s=stg(p),c=cur(p),D=p.done||{},it=STEPS[s].items,n=it.filter((_,i)=>D[s+'.'+i]).length;return `<div class='pills'>`+STEPS.map((x,k)=>{const ok=x.items.every((_,i)=>D[k+'.'+i]);return `<button class='pill${k===s?' on':''}${k===c?' now':''}' data-a='stage' data-s='${k}' data-id='${p.id}'><span>${ok?'✅':x.i}</span>${x.n}</button>`}).join('')+`</div><div class='mut'>${s===c?'Você está nesta etapa agora.':s<c?'Etapa anterior.':'Etapa futura: veja o que vem pela frente.'} ${n} de ${it.length} feitos.<br><b>Foco:</b> ${STEPS[s].f}</div>`+it.map((t,i)=>`<label class='chk${D[s+'.'+i]?' d':''}'><input type='checkbox' data-ck='${p.id}|${s}.${i}' ${D[s+'.'+i]?'checked':''}><span>${esc(fill2(t,p))}</span></label>`).join('')+`<button class='b-p' style='margin-top:8px' data-a='finish' data-id='${p.id}'>${n===it.length?'Desmarcar tudo':'✅ Concluir etapa'}</button>`}
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.ck;if(!k)return;const[id,key]=k.split('|'),p=S.plants.find(x=>x.id===id);if(!p)return;p.done=p.done||{};p.done[key]=e.target.checked;save();render()});
+(function(){const map={'Hoje':'home','Para plantar este mês':'home','Minhas plantas':'plants','Calendário':'cal','Plantar algo novo':'add','Desempenho dos adubos':'perf','Links e favoritos':'links','Compartilhar':'more','Backup e lembretes':'more'},m=document.querySelector('main');let cur=null;[...m.children].forEach(el=>{if(el.tagName==='H2'){cur=document.createElement('section');cur.dataset.t=map[el.textContent.trim()]||'more';m.insertBefore(cur,el)}if(cur)cur.appendChild(el)});const sh=m.querySelector('section[data-t=add]');if(sh){sh.id='sheet';const g=document.createElement('div');g.className='grab';sh.prepend(g);const b=document.createElement('button');b.textContent='Cancelar';b.style.marginTop='10px';b.onclick=()=>closeSheet();sh.appendChild(b)}})();
+function setTab(t){document.querySelectorAll('main>section').forEach(s=>{if(s.dataset.t!=='add')s.hidden=s.dataset.t!==t});document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('fab').hidden=!(t==='home'||t==='plants');window.scrollTo(0,0)}
+function openSheet(){$('sheet').classList.add('open');$('scrim').classList.add('open')}
+function closeSheet(){$('sheet').classList.remove('open');$('scrim').classList.remove('open')}
+$('bn').addEventListener('click',e=>{const b=e.target.closest('.ni');if(b){closeSheet();setTab(b.dataset.t)}});
+$('fab').addEventListener('click',openSheet);$('scrim').addEventListener('click',closeSheet);
+const LK0=[{t:'Meus repositórios no GitHub',u:'https://github.com/morchemarques?tab=repositories'}];
+let LK=[],pub='';try{LK=JSON.parse(localStorage.getItem('horta-links')||'[]');pub=localStorage.getItem('horta-pub')||''}catch(e){}
+function saveLK(){try{localStorage.setItem('horta-links',JSON.stringify(LK))}catch(e){}}
+function renderLinks(){$('lk').innerHTML=[...LK0.map(x=>({...x,f:1})),...LK.map((x,i)=>({...x,i}))].map(x=>`<div class='task'><a href='${esc(x.u)}' target='_blank' rel='noopener noreferrer' style='color:var(--leaf);font-weight:600;word-break:break-all;flex:1'>⭐ ${esc(x.t)}<br><span class='mut' style='font-weight:400'>${esc(x.u)}</span></a>${x.f?'':`<button data-lk='${x.i}' aria-label='Remover favorito'>✕</button>`}</div>`).join('')+`<div class='grid' style='margin-top:10px'><div><label for='lt'>Nome</label><input id='lt' placeholder='Ex.: Guia de adubação'></div><div><label for='lu'>Endereço (link)</label><input id='lu' type='url' placeholder='https://...'></div></div><button class='b-p' id='la' style='margin-top:8px'>+ Adicionar favorito</button>`}
+$('lk').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='la'){let u=$('lu').value.trim();const t=$('lt').value.trim();if(!u)return;if(!u.startsWith('http://')&&!u.startsWith('https://'))u='https://'+u;try{new URL(u)}catch(x){$('lu').focus();return}LK.push({t:t||u,u});saveLK();renderLinks()}else if(b.dataset.lk!==undefined){LK.splice(+b.dataset.lk,1);saveLK();renderLinks()}});
+const okHost=h=>!['localhost','127.0.0.1'].includes(h)&&!h.startsWith('192.168.')&&!h.startsWith('10.')&&location.protocol.startsWith('http');
+const shareUrl=()=>pub||(okHost(location.hostname)?location.href.split('#')[0]:'');
+async function doShare(text,url){const d={title:'Calendário da Horta',text};if(url)d.url=url;try{if(navigator.share){await navigator.share(d);return 'Compartilhado.'}}catch(e){if(e&&e.name==='AbortError')return ''}try{await navigator.clipboard.writeText(text+(url?'\n'+url:''));return 'Texto copiado. Cole onde quiser.'}catch(e){return 'Não consegui compartilhar neste navegador.'}}
+function summary(){if(!S.plants.length)return 'Minha horta está começando! 🌱';return '🌱 Minha horta ('+new Date().toLocaleDateString('pt-BR')+')\n'+S.plants.map(p=>'• '+p.name+(p.spec?' ('+p.spec+')':'')+': dia '+age(p)+' de '+p.harvest+hvTxt(p)).join('\n')}
+async function shareApp(){const u=shareUrl(),m=await doShare('Calendário da Horta: organize rega, adubo, pragas e colheitas da sua horta.',u);if(m==='')return;$('sm').textContent=m+(u?'':' Dica: informe abaixo o endereço público do app, senão o link não abre para outras pessoas.');if(m!=='Compartilhado.'&&$('shc').closest('section').hidden)setTab('more')}
+function renderShare(){$('shc').innerHTML=`<div class='mut'><b>Calendário da Horta</b> · versão 1.0<br>Organize rega, adubação, pragas e colheitas da sua horta.</div><div class='row'><button class='b-p' id='s1'>Compartilhar o app</button><button id='s2'>Compartilhar resumo da horta</button></div><label for='pb'>Endereço público do app (para os outros abrirem)</label><input id='pb' type='url' placeholder='https://seunome.github.io/horta/' value='${esc(pub)}'><p class='mut' id='sm'></p>`}
+$('shc').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='s1')shareApp();else if(b.id==='s2'){const m=await doShare(summary(),'');if(m)$('sm').textContent=m}});
+$('shc').addEventListener('change',e=>{if(e.target.id==='pb'){pub=e.target.value.trim();try{localStorage.setItem('horta-pub',pub)}catch(x){}}});
+$('shb').addEventListener('click',shareApp);$('lkb').addEventListener('click',()=>{closeSheet();setTab('links')});
+renderLinks();renderShare();
+setTab('home');
+fillSp();load();render();notify();
+</script>
+</body>
+</html>
