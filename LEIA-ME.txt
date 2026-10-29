@@ -1,18 +1,23 @@
 CALENDÁRIO DA HORTA - instalar como app no Android (Chrome)
 
-OPÇÃO A: pelo Localhost Lite (o que você já usa)
-1. Extraia o zip. Você terá uma pasta com index.html, manifest.webmanifest, sw.js e os ícones.
-2. Copie a pasta inteira (por exemplo, com o nome "Horta") para a pasta raiz do Localhost Lite.
-   Todos os arquivos precisam ficar juntos na mesma pasta.
-3. Com o servidor ligado, abra no Chrome: http://localhost:8080/Horta/
-   (use "localhost", não o número 192.168...; só assim o Chrome libera a instalação)
-4. Toque em ⋮ > "Instalar app" (ou no botão "Instalar app" do topo da tela).
-5. Depois de instalado, o app abre sozinho e funciona sem internet.
+COMO ATUALIZAR (GitHub Pages)
+1. No repositório do app, envie estes arquivos substituindo os antigos (todos na mesma pasta):
+   index.html, manifest.webmanifest, sw.js, icon.svg, icon-192.png, icon-512.png
+2. Aguarde 1 a 2 minutos o GitHub publicar.
+3. Abra o app com internet. Ele sempre carrega a versão mais nova quando está online
+   e usa a cópia guardada quando está offline.
 
-OPÇÃO B: hospedar na internet (https)
-Envie os mesmos arquivos para o GitHub Pages, Netlify ou Cloudflare Pages e abra o endereço no Chrome.
+COMO INSTALAR
+1. Abra o endereço do app no Chrome (https://...).
+2. Toque em ⋮ > "Instalar app" (ou no botão "Instalar" do topo do app).
 
-IMPORTANTE
-- Os dados das plantas ficam salvos no endereço usado (ex.: localhost:8080). Se mudar de endereço, use
-  "Copiar backup" no app antigo e "Restaurar" no novo (aba Mais).
-- Para atualizar o app depois, troque os arquivos na pasta e abra o app com internet/servidor ligado uma vez.
+PELO LOCALHOST LITE
+Copie a pasta inteira para o Localhost Lite e abra http://localhost:8080/NOME-DA-PASTA/
+(use "localhost", não o número 192.168...).
+
+BACKUP NA NUVEM
+No app, aba Mais > Backup e nuvem:
+- "Salvar na nuvem": abre o menu do Android; escolha Google Drive, Mega ou outro app.
+- "Baixar arquivo": salva o .json no celular para você enviar à nuvem pelo app Arquivos.
+- "Restaurar de arquivo": escolha o .json no Drive/Mega/Arquivos para recuperar tudo.
+Os dados ficam salvos por endereço (ex.: morchemarques.github.io). Em outro endereço, restaure pelo arquivo.
