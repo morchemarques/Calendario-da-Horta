@@ -1,4 +1,4 @@
-const C="horta-v10",F=["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png"];
+const C="horta-v11",F=["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(F)))});
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 // Rede primeiro: com internet, sempre abre a versão mais nova; sem internet, usa a cópia guardada.

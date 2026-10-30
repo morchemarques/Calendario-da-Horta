@@ -97,7 +97,13 @@ main>.row h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size
 .how .st{display:flex;gap:12px;align-items:flex-start;padding:8px 0}.how .st b{flex:none;width:28px;height:28px;border-radius:50%;background:var(--leaf);color:var(--bg);display:flex;align-items:center;justify-content:center}
 #bkst{margin-bottom:10px}#bn{box-shadow:0 -2px 8px rgba(0,0,0,.08)}
 .wxs>div{background:var(--ok)!important}.wxs b{font-size:1.15rem!important}#wx .card{margin-bottom:12px}#ctr .row{margin:6px 0}
-.head>div{flex:1;min-width:0}.dl{align-self:flex-start;flex:none}
+.head>div{flex:1;min-width:0}.dl{align-self:flex-start;flex:none;background:var(--wbg);color:var(--warn)}
+#dlgs{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60}#dlgs[hidden],#dlg[hidden]{display:none}
+#dlg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(320px,calc(100vw - 48px));background:var(--bg);color:var(--tx);border-radius:28px;padding:24px;z-index:61;box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.dli{width:48px;height:48px;border-radius:50%;background:var(--wbg);color:var(--warn);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}.dli svg{width:26px;height:26px;fill:currentColor}
+#dlg h3{margin:0 0 8px;font-size:1.2rem;text-align:center}#dlg p{margin:0 0 18px;color:var(--mut);text-align:center}
+.dla{display:flex;gap:8px;justify-content:flex-end}.b-del{background:var(--warn);border-color:var(--warn);color:#fff}
+@media (prefers-color-scheme:dark){.b-del{color:#410002}}
 #snack{position:fixed;left:12px;right:12px;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:50;background:#2e312b;color:#f1f1ea;border-radius:12px;padding:6px 8px 6px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}#snack[hidden]{display:none}#snack button{background:none;border:0;color:#bcf0b4;font-weight:700;min-height:44px}
 </style>
 </head>
@@ -242,7 +248,7 @@ function render(){renderExtra();
     const hs=p.log.filter(x=>x.type==="height").sort((x,y)=>x.t-y.t);
     const cur=hs.length?hs[hs.length-1].v+" cm":"sem medida";
     return `<div class="card" data-id="${p.id}">
-     ${p.photo?`<img class='cover' src='${p.photo}' alt='Foto de ${esc(p.name)}'>`:''}<div class="head"><span class="ico">${ico(pk(p))}</span><div><div class="name">${esc(p.name)}</div><div class="mut">${esc(p.preset)}${p.spec?" · "+esc(p.spec):""}${locTxt(p)?" · "+locTxt(p):""}</div><div class="mut">Dia ${a} · altura: ${cur}${hvTxt(p)}</div></div><button class="ib dl" data-a="del" data-id="${p.id}" aria-label="Remover planta" title="Remover planta">🗑️</button></div>
+     ${p.photo?`<img class='cover' src='${p.photo}' alt='Foto de ${esc(p.name)}'>`:''}<div class="head"><span class="ico">${ico(pk(p))}</span><div><div class="name">${esc(p.name)}</div><div class="mut">${esc(p.preset)}${p.spec?" · "+esc(p.spec):""}${locTxt(p)?" · "+locTxt(p):""}</div><div class="mut">Dia ${a} · altura: ${cur}${hvTxt(p)}</div></div><button class="ib dl" data-a="del" data-id="${p.id}" aria-label="Remover planta" title="Remover planta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div>
      ${p.adult?adultBar(p):stages(p)}
      
      <div class="row" style="margin:10px 0">${chip(p,"water")}${chip(p,"feed")}${chip(p,"inspect")}</div>
@@ -295,7 +301,7 @@ document.addEventListener("click",e=>{
   else if(a==="pestlog")p.log.push({t:now,type:"pest",v:$("ps-"+p.id).value+" → "+$("pt-"+p.id).value});
   else if(a==="height"){const v=parseFloat($("h-"+p.id).value);if(isNaN(v)||v<0){$("h-"+p.id).focus();return}p.log.push({t:now,type:"height",v})}
   else if(a==="note"){const v=$("n-"+p.id).value.trim();if(!v)return;p.log.push({t:now,type:"note",v})}
-  else if(a==="del"){delPlant(p)}
+  else if(a==="del"){askDel(p)}
   save();render();
 });
 
@@ -447,6 +453,9 @@ async function findCity(){const q=$('cty').value.trim();if(q.length<2)return;try
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){closeSheet();setTab(g.dataset.go);return}const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w;if(a==='gps')geo();else if(a==='refresh')loadWx(true);else if(a==='clear'){LOC=null;WX=null;try{localStorage.removeItem('horta-loc');localStorage.removeItem('horta-wx')}catch(x){}wmsg='';render()}else if(a==='find')findCity();else if(a==='pick'){LOC={lat:+(+b.dataset.la).toFixed(2),lon:+(+b.dataset.lo).toFixed(2),name:b.dataset.n};saveLoc();loadWx(true)}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadWx(false)});
 loadWx(false);
+function closeDlg(){const d=$('dlg');if(d){d.hidden=true;$('dlgs').hidden=true}}
+function askDel(p){let d=$('dlg');if(!d){const s=document.createElement('div');s.id='dlgs';s.hidden=true;s.onclick=closeDlg;document.body.appendChild(s);d=document.createElement('div');d.id='dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');d.hidden=true;document.body.appendChild(d)}d.innerHTML=`<div class='dli'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/></svg></div><h3>Remover “${esc(p.name)}”?</h3><p>Isso apaga a planta e todo o histórico dela: regas, adubos, medidas, colheitas e fotos.</p><div class='dla'><button id='dno'>Cancelar</button><button id='dyes' class='b-del'>Remover</button></div>`;d.hidden=false;$('dlgs').hidden=false;$('dno').focus();$('dno').onclick=closeDlg;$('dyes').onclick=()=>{closeDlg();delPlant(p)}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDlg()});
 let lastDel=null,snT;
 function snack(msg,undo){let s=$('snack');if(!s){s=document.createElement('div');s.id='snack';document.body.appendChild(s)}s.hidden=false;s.innerHTML=`<span>${esc(msg)}</span>${undo?`<button id='undo'>Desfazer</button>`:''}`;clearTimeout(snT);snT=setTimeout(()=>{s.hidden=true;lastDel=null},7000)}
 function delPlant(p){const i=S.plants.indexOf(p);if(i<0)return;S.plants.splice(i,1);lastDel={p,i};save();render();snack('“'+p.name+'” removida',true)}
