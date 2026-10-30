@@ -78,7 +78,7 @@ button{border-radius:20px}.chip{border-radius:8px}input,select,textarea{border-r
 #scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}#scrim.open{opacity:1;pointer-events:auto}
 section[data-t=add]{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--bg);border-radius:28px 28px 0 0;padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));z-index:40;box-shadow:0 -4px 24px rgba(0,0,0,.3);transform:translateY(105%);visibility:hidden;transition:transform .25s,visibility .25s;max-width:720px;margin:0 auto}
 section[data-t=add].open{transform:none;visibility:visible}section[data-t=add] .card{background:none;padding:0}.grab{width:36px;height:4px;border-radius:2px;background:var(--bd);margin:0 auto 8px}
-.tb{display:flex;gap:2px;align-items:center;margin-left:auto}.tb .b-p{padding:6px 12px;min-height:40px}.ib{width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;border-radius:22px;color:var(--tx)}.ib svg{width:24px;height:24px;fill:currentColor}
+.tbar{display:flex;gap:2px;align-items:center;margin-left:auto}.tbar .b-p{padding:6px 12px;min-height:40px}.ib{width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;border-radius:22px;color:var(--tx)}.ib svg{width:24px;height:24px;fill:currentColor}
 :root{--h1:#2f6b3a;--h2:#4f8f46}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--h1:#254a23;--h2:#3e7a3a}}
 #date{display:none}
@@ -97,12 +97,14 @@ main>.row h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size
 .how .st{display:flex;gap:12px;align-items:flex-start;padding:8px 0}.how .st b{flex:none;width:28px;height:28px;border-radius:50%;background:var(--leaf);color:var(--bg);display:flex;align-items:center;justify-content:center}
 #bkst{margin-bottom:10px}#bn{box-shadow:0 -2px 8px rgba(0,0,0,.08)}
 .wxs>div{background:var(--ok)!important}.wxs b{font-size:1.15rem!important}#wx .card{margin-bottom:12px}#ctr .row{margin:6px 0}
+.head>div{flex:1;min-width:0}.dl{align-self:flex-start;flex:none}
+#snack{position:fixed;left:12px;right:12px;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:50;background:#2e312b;color:#f1f1ea;border-radius:12px;padding:6px 8px 6px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}#snack[hidden]{display:none}#snack button{background:none;border:0;color:#bcf0b4;font-weight:700;min-height:44px}
 </style>
 </head>
 <body>
 <main>
   <div class="row" style="justify-content:space-between">
-    <div><h1>Calendário da Horta 🌱</h1><p class="sub" id="date"></p></div><span class="tb"><button id="inst" class="b-p" hidden>📲 Instalar</button><button class="ib" id="shb" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button><button class="ib" id="lkb" aria-label="Links e favoritos"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button></span>
+    <div><h1>Calendário da Horta 🌱</h1><p class="sub" id="date"></p></div><span class="tbar"><button id="inst" class="b-p" hidden>📲 Instalar</button><button class="ib" id="shb" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button><button class="ib" id="lkb" aria-label="Links e favoritos"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button></span>
   </div>
 
   <h2>Hoje</h2>
@@ -240,7 +242,7 @@ function render(){renderExtra();
     const hs=p.log.filter(x=>x.type==="height").sort((x,y)=>x.t-y.t);
     const cur=hs.length?hs[hs.length-1].v+" cm":"sem medida";
     return `<div class="card" data-id="${p.id}">
-     ${p.photo?`<img class='cover' src='${p.photo}' alt='Foto de ${esc(p.name)}'>`:''}<div class="head"><span class="ico">${ico(pk(p))}</span><div><div class="name">${esc(p.name)}</div><div class="mut">${esc(p.preset)}${p.spec?" · "+esc(p.spec):""}${locTxt(p)?" · "+locTxt(p):""}</div><div class="mut">Dia ${a} · altura: ${cur}${hvTxt(p)}</div></div></div>
+     ${p.photo?`<img class='cover' src='${p.photo}' alt='Foto de ${esc(p.name)}'>`:''}<div class="head"><span class="ico">${ico(pk(p))}</span><div><div class="name">${esc(p.name)}</div><div class="mut">${esc(p.preset)}${p.spec?" · "+esc(p.spec):""}${locTxt(p)?" · "+locTxt(p):""}</div><div class="mut">Dia ${a} · altura: ${cur}${hvTxt(p)}</div></div><button class="ib dl" data-a="del" data-id="${p.id}" aria-label="Remover planta" title="Remover planta">🗑️</button></div>
      ${p.adult?adultBar(p):stages(p)}
      
      <div class="row" style="margin:10px 0">${chip(p,"water")}${chip(p,"feed")}${chip(p,"inspect")}</div>
@@ -293,7 +295,7 @@ document.addEventListener("click",e=>{
   else if(a==="pestlog")p.log.push({t:now,type:"pest",v:$("ps-"+p.id).value+" → "+$("pt-"+p.id).value});
   else if(a==="height"){const v=parseFloat($("h-"+p.id).value);if(isNaN(v)||v<0){$("h-"+p.id).focus();return}p.log.push({t:now,type:"height",v})}
   else if(a==="note"){const v=$("n-"+p.id).value.trim();if(!v)return;p.log.push({t:now,type:"note",v})}
-  else if(a==="del"){if(!confirm("Remover "+p.name+" e todo o histórico?"))return;S.plants=S.plants.filter(x=>x!==p)}
+  else if(a==="del"){delPlant(p)}
   save();render();
 });
 
@@ -445,6 +447,10 @@ async function findCity(){const q=$('cty').value.trim();if(q.length<2)return;try
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){closeSheet();setTab(g.dataset.go);return}const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w;if(a==='gps')geo();else if(a==='refresh')loadWx(true);else if(a==='clear'){LOC=null;WX=null;try{localStorage.removeItem('horta-loc');localStorage.removeItem('horta-wx')}catch(x){}wmsg='';render()}else if(a==='find')findCity();else if(a==='pick'){LOC={lat:+(+b.dataset.la).toFixed(2),lon:+(+b.dataset.lo).toFixed(2),name:b.dataset.n};saveLoc();loadWx(true)}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadWx(false)});
 loadWx(false);
+let lastDel=null,snT;
+function snack(msg,undo){let s=$('snack');if(!s){s=document.createElement('div');s.id='snack';document.body.appendChild(s)}s.hidden=false;s.innerHTML=`<span>${esc(msg)}</span>${undo?`<button id='undo'>Desfazer</button>`:''}`;clearTimeout(snT);snT=setTimeout(()=>{s.hidden=true;lastDel=null},7000)}
+function delPlant(p){const i=S.plants.indexOf(p);if(i<0)return;S.plants.splice(i,1);lastDel={p,i};save();render();snack('“'+p.name+'” removida',true)}
+document.addEventListener('click',e=>{if(e.target.id==='undo'&&lastDel){S.plants.splice(Math.min(lastDel.i,S.plants.length),0,lastDel.p);lastDel=null;save();render();$('snack').hidden=true}});
 renderLinks();renderShare();
 setTab('home');
 fillSp();load();render();notify();
